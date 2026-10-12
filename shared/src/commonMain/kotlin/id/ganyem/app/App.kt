@@ -1,6 +1,8 @@
 package id.ganyem.app
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,23 +29,42 @@ fun App(repository: AuthRepository) {
         mutableStateOf<String?>(null)
     }
 
-    if (tokens == null) {
-        LoginScreen(
-            repository = repository,
-            onLoginSuccess = { appTokens ->
-                tokens = appTokens
-            }
-        )
-    } else {
-        HomeScreen(
-            accessToken = tokens!!.accessToken,
-            onLogout = {
-                scope.launch {
-                    repository.logout()
-                    tokens = null
-                }
+    LaunchedEffect(repository) {
+        try {
+            tokens = repository.restoreSession()
+        } catch (e: Exception) {
+            error = e.message ?: "Gagal memulihkan sesi."
+            tokens = null
+        } finally {
+            loading = false
+        }
+    }
 
-            }
-        )
+    when {
+        loading -> {
+            CircularProgressIndicator()
+        }
+
+        tokens == null -> {
+            LoginScreen(
+                repository = repository,
+                onLoginSuccess = { appTokens ->
+                    tokens = appTokens
+                    error = null
+                }
+            )
+        }
+
+        else -> {
+            HomeScreen(
+                accessToken = tokens!!.accessToken,
+                onLogout = {
+                    scope.launch {
+                        repository.logout()
+                        tokens = null
+                    }
+                }
+            )
+        }
     }
 }

@@ -58,6 +58,15 @@ class AndroidGoogleAuthProvider(
             ?: error("Firebase ID Token tidak tersedia")
     }
 
+    override suspend fun getIdToken(forceRefresh: Boolean): String {
+        val user = FirebaseAuth.getInstance().currentUser
+            ?: error("sesi Firebase tidak tersedia. Silahkan login kembali.")
+        return user.getIdToken(forceRefresh)
+            .await()
+            .token
+            ?: error("Firebase ID Token tidak tersedia.")
+    }
+
     override suspend fun signOut() {
         FirebaseAuth.getInstance().signOut()
 
