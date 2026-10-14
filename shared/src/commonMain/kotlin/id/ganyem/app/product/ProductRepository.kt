@@ -1,21 +1,9 @@
 package id.ganyem.app.product
 
-class ProductRepository (
-    private val productApi: ProductApi
-) {
-    suspend fun getProducts(): ProductListResponse {
-        return productApi.getProducts()
-    }
+interface ProductRepository {
+    suspend fun getProducts(): ProductListResponse
+    suspend fun updateProduct(id: String, request: UpdateProductRequest)
+    suspend fun createProduct(request: CreateProductRequest)
 
-    suspend fun updateProduct(id: String, request: UpdateProductRequest) {
-        productApi.updateProduct(id, request)
-    }
-
-    suspend fun createProduct(request: CreateProductRequest) {
-        productApi.createProduct(request)
-    }
-
-    suspend fun deleteProduct(id: String) {
-        productApi.deleteProduct(id)
-    }
+    suspend fun deleteProduct(id: String)
 }

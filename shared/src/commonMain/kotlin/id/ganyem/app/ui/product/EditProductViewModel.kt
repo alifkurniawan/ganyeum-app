@@ -104,11 +104,14 @@ class EditProductViewModel (
                 repository.updateProduct(
                     id = product.id,
                     request = UpdateProductRequest(
-                        productName = state.productName,
+                        productName = name,
                         initialPrice = validCost,
                         sellingPrice = validPrice
                     )
                 )
+                _uiState.update {
+                    it.copy(isSuccess = true)
+                }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(error = e.message

@@ -7,10 +7,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 
+fun interface ProductCreator {
+    suspend fun createProduct(request: CreateProductRequest)
+}
+
 class ProductApi (
     private val apiClient: ApiClient
-) {
-    suspend fun createProduct(
+) : ProductCreator {
+    override suspend fun createProduct(
         request: CreateProductRequest
     ) {
         val response = apiClient.post("/products") {

@@ -13,6 +13,7 @@ import id.ganyem.app.auth.TokenManager
 import id.ganyem.app.auth.TokenStorage
 import id.ganyem.app.network.ApiClient
 import id.ganyem.app.network.AuthApi
+import id.ganyem.app.product.DefaultProductRepository
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
 
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
             apiClient = apiClient
         )
 
-        val productRepository = ProductRepository(
+        val productRepository = DefaultProductRepository(
             productApi
         )
 

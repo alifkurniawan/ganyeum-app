@@ -3,7 +3,7 @@ package id.ganyem.app.ui.product
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.ganyem.app.product.CreateProductRequest
-import id.ganyem.app.product.ProductApi
+import id.ganyem.app.product.ProductCreator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +20,7 @@ data class AddProductUiState(
 )
 
 class AddProductViewModel (
-    private val productApi: ProductApi
+    private val productApi: ProductCreator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         AddProductUiState()
