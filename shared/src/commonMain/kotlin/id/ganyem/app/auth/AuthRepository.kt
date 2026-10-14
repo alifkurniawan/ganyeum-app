@@ -42,7 +42,6 @@ class AuthRepository (
             refreshAccessToken()
         } catch (e: Exception) {
             tokenManager.clearTokens()
-            tokenStorage.clear()
             null
         }
     }

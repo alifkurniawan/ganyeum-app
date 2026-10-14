@@ -6,17 +6,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import id.ganyem.app.auth.AppTokens
 import id.ganyem.app.auth.AuthRepository
-import id.ganyem.app.ui.HomeScreen
+import id.ganyem.app.product.Product
+import id.ganyem.app.product.ProductApi
+import id.ganyem.app.product.ProductRepository
 import id.ganyem.app.ui.LoginScreen
-import kotlinx.coroutines.launch
+import id.ganyem.app.ui.product.AddProductScreen
+import id.ganyem.app.ui.product.EditProductScreen
+import id.ganyem.app.ui.product.ProductListScreen
 
 @Composable
-fun App(repository: AuthRepository) {
-    val scope = rememberCoroutineScope()
+fun App(
+    repository: AuthRepository,
+    productRepository: ProductRepository,
+    productApi: ProductApi
+) {
     var tokens by remember {
         mutableStateOf<AppTokens?>(null)
     }
@@ -27,6 +33,14 @@ fun App(repository: AuthRepository) {
 
     var error by remember {
         mutableStateOf<String?>(null)
+    }
+
+    var showAddProduct by remember {
+        mutableStateOf(false)
+    }
+
+    var selectedProduct by remember {
+        mutableStateOf<Product?>(null)
     }
 
     LaunchedEffect(repository) {
@@ -56,15 +70,38 @@ fun App(repository: AuthRepository) {
         }
 
         else -> {
-            HomeScreen(
-                accessToken = tokens!!.accessToken,
-                onLogout = {
-                    scope.launch {
-                        repository.logout()
-                        tokens = null
-                    }
+            when {
+                selectedProduct != null -> {
+                    EditProductScreen(
+                        product = selectedProduct!!,
+                        repository = productRepository,
+                        onBack = {
+                            selectedProduct = null
+                        }
+                    )
                 }
-            )
+
+                showAddProduct -> {
+                    AddProductScreen(
+                        productApi = productApi,
+                        onBack = {
+                            showAddProduct = false
+                        }
+                    )
+                }
+
+                else -> {
+                    ProductListScreen(
+                        repository = productRepository,
+                        onAddProduct = {
+                            showAddProduct = true
+                        },
+                        onEditProduct = { product ->
+                            selectedProduct = product
+                        }
+                    )
+                }
+            }
         }
     }
 }

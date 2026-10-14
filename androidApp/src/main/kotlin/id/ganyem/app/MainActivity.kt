@@ -13,12 +13,14 @@ import id.ganyem.app.auth.TokenManager
 import id.ganyem.app.auth.TokenStorage
 import id.ganyem.app.network.ApiClient
 import id.ganyem.app.network.AuthApi
+import id.ganyem.app.product.ProductApi
+import id.ganyem.app.product.ProductRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val baseUrl = "http://192.168.1.5:8080"
+        val baseUrl = "http://192.168.1.8:8080/api"
         val googleAuth = AndroidGoogleAuthProvider(
             activity = this,
             webClientId = getString(R.string.default_web_client_id)
@@ -39,15 +41,27 @@ class MainActivity : ComponentActivity() {
         )
 
         val apiClient = ApiClient(
-            baseUrl = "http://192.168.1.5:8080",
+            baseUrl = baseUrl,
             tokenManager = tokenManager,
             refreshAccessToken = {
                 repository.refreshAccessToken()
             }
         )
 
+        val productApi = ProductApi(
+            apiClient = apiClient
+        )
+
+        val productRepository = ProductRepository(
+            productApi
+        )
+
         setContent {
-            App(repository = repository)
+            App(
+                repository = repository,
+                productRepository = productRepository,
+                productApi = productApi
+            )
         }
     }
 }

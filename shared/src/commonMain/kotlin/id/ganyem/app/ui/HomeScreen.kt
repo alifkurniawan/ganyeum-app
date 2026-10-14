@@ -27,6 +27,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun HomeScreen (
     accessToken: String?,
+    onAddProduct: () -> Unit,
     onLogout: () -> Unit
 ){
     val scope = rememberCoroutineScope()
@@ -42,6 +43,10 @@ fun HomeScreen (
         ) {
             Button(onClick = { showContent = !showContent }) {
                 Text("Click me!")
+            }
+
+            Button(onClick = { onAddProduct()} ) {
+                Text("Add Product!")
             }
 
             Button(onClick = {onLogout()}) {

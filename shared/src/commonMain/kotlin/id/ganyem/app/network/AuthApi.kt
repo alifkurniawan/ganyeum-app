@@ -7,7 +7,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -37,7 +39,7 @@ class AuthApi (
 
     suspend fun exchangeToken(firebaseIdToken: String): AppTokens {
         val response = client.post(
-            "$baseUrl/api/auth/exchange"
+            "$baseUrl/auth/exchange"
         ) {
             contentType(ContentType.Application.Json)
             setBody(
@@ -46,6 +48,18 @@ class AuthApi (
                 )
             )
         }
+        if (response.status == HttpStatusCode.Unauthorized) {
+            throw IllegalStateException(
+                "Firebase ID Token ditolak oleh backend"
+            )
+        }
+
+        if (!response.status.isSuccess()) {
+            throw IllegalStateException(
+                "Backend gagal memproses authentikasi: ${response.status}"
+            )
+        }
+
         val result = response.body<ExchangeResponse>()
         require(result.accessToken.isNotBlank()) {
             "Backend returned an empty access token"
