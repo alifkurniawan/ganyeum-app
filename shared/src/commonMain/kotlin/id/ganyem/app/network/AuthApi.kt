@@ -39,7 +39,7 @@ class AuthApi (
 
     suspend fun exchangeToken(firebaseIdToken: String): AppTokens {
         val response = client.post(
-            "$baseUrl/auth/exchange"
+            "$baseUrl/auth/seller/exchange"
         ) {
             contentType(ContentType.Application.Json)
             setBody(
