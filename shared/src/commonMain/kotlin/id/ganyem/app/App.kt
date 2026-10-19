@@ -25,6 +25,7 @@ import id.ganyem.app.ui.HomeScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
 import id.ganyem.app.ui.order.OrderScreen
+import id.ganyem.app.ui.order.OrderListScreen
 import id.ganyem.app.ui.product.AddProductScreen
 import id.ganyem.app.ui.product.EditProductScreen
 import id.ganyem.app.ui.product.ProductListScreen
@@ -110,7 +111,7 @@ fun App(
                     PlaceholderScreen("Home")
                 },
                 ordersContent = {
-                    showCreateOrder = true
+                    OrderListScreen(repository = orderRepository)
                 },
                 itemsContent = {
                     when {

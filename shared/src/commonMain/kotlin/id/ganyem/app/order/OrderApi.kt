@@ -26,11 +26,23 @@ class OrderApi (
         }
     }
 
-    suspend fun getOrder(query: String = "", page: Int = 1): OrderListResponse {
+    suspend fun getOrder(
+        status: String? = null,
+        page: Int = 1,
+        orderId: String? = null,
+        toDate: String? = null,
+        fromDate: String? = null,
+        invoiceId: String? = null
+    ): OrderListResponse {
         val response = apiClient.get("/orders") {
             url {
-                parameters.append("query", query)
                 parameters.append("page", page.toString())
+                parameters.append("size", "50")
+                status?.takeIf { it.isNotBlank() }?.let { parameters.append("status", it) }
+                orderId?.takeIf { it.isNotBlank() }?.let { parameters.append("orderId", it) }
+                toDate?.takeIf { it.isNotBlank() }?.let { parameters.append("toDate", it) }
+                fromDate?.takeIf { it.isNotBlank() }?.let { parameters.append("fromDate", it) }
+                invoiceId?.takeIf { it.isNotBlank() }?.let { parameters.append("invoiceId", it) }
             }
         }
         if (!response.status.isSuccess()) {
