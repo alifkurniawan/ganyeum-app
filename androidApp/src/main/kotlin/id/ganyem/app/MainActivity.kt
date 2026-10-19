@@ -16,9 +16,14 @@ import id.ganyem.app.customer.CustomerRepository
 import id.ganyem.app.customer.CustomerRepositoryImpl
 import id.ganyem.app.network.ApiClient
 import id.ganyem.app.network.AuthApi
+import id.ganyem.app.order.OrderApi
+import id.ganyem.app.order.OrderRepositoryImpl
 import id.ganyem.app.product.DefaultProductRepository
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
+import id.ganyem.app.shipping.Shipping
+import id.ganyem.app.shipping.ShippingApi
+import id.ganyem.app.shipping.ShippingRepositoryImpl
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,13 +73,29 @@ class MainActivity : ComponentActivity() {
             customerApi= customerApi
         )
 
+        val shippingApi = ShippingApi(
+            apiClient = apiClient
+        )
+
+        val shippingRepository = ShippingRepositoryImpl(
+            shippingApi = shippingApi
+        )
+
+        val orderRepository = OrderRepositoryImpl(
+            orderApi = OrderApi(
+                apiClient = apiClient
+            )
+        )
+
 
         setContent {
             App(
                 repository = repository,
                 productRepository = productRepository,
                 productApi = productApi,
-                customerRepository = customerRepository
+                customerRepository = customerRepository,
+                shippingRepository = shippingRepository,
+                orderRepository = orderRepository
             )
         }
     }

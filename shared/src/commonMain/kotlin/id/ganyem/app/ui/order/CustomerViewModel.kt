@@ -184,4 +184,10 @@ class CustomerViewModel (
         }
     }
 
+    fun reset() {
+        _uiState.update {
+            CustomerUiState()
+        }
+    }
+
 }

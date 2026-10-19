@@ -1,0 +1,44 @@
+package id.ganyem.app.order
+
+import id.ganyem.app.network.ApiClient
+import io.ktor.client.call.body
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+
+
+class OrderApi (
+    private val apiClient: ApiClient
+) {
+    suspend fun createOrder(
+        request: CreateOrderRequest
+    ) {
+        val response = apiClient.post("/orders") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        if (!response.status.isSuccess()) {
+            throw IllegalStateException(
+                "Gagal membuat order: HTTP ${response.status.value}"
+            )
+        }
+    }
+
+    suspend fun getOrder(query: String = "", page: Int = 1): OrderListResponse {
+        val response = apiClient.get("/orders") {
+            url {
+                parameters.append("query", query)
+                parameters.append("page", page.toString())
+            }
+        }
+        if (!response.status.isSuccess()) {
+            throw IllegalStateException(
+                "Gagal mengambil order: HTTP ${response.status.value}"
+            )
+        }
+        val result = response.body<OrderListResponse>()
+        return result
+    }
+}

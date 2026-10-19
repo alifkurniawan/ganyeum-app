@@ -16,9 +16,11 @@ import androidx.compose.ui.Modifier
 import id.ganyem.app.auth.AppTokens
 import id.ganyem.app.auth.AuthRepository
 import id.ganyem.app.customer.CustomerRepository
+import id.ganyem.app.order.OrderRepository
 import id.ganyem.app.product.Product
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
+import id.ganyem.app.shipping.ShippingRepository
 import id.ganyem.app.ui.HomeScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
@@ -33,7 +35,9 @@ fun App(
     repository: AuthRepository,
     productRepository: ProductRepository,
     productApi: ProductApi,
-    customerRepository: CustomerRepository
+    customerRepository: CustomerRepository,
+    shippingRepository: ShippingRepository,
+    orderRepository: OrderRepository
 ) {
     val scope = rememberCoroutineScope()
 
@@ -90,7 +94,10 @@ fun App(
         showCreateOrder -> {
             OrderScreen(
                 onBack = {showCreateOrder = false },
-                customerRepository = customerRepository
+                customerRepository = customerRepository,
+                productRepository = productRepository,
+                shippingRepository = shippingRepository,
+                orderRepository = orderRepository
             )
         }
 
