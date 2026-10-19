@@ -27,8 +27,10 @@ class ApiClient(
         }
     }
 
-    suspend fun get(path: String) =
-        request(HttpMethod.Get, path)
+    suspend fun get(
+        path: String,
+        configure: HttpRequestBuilder.() -> Unit = {}
+    ) = request(HttpMethod.Get, path, configure)
 
     suspend fun post(
         path: String,

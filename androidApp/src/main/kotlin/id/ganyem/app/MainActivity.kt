@@ -11,6 +11,9 @@ import id.ganyem.app.auth.AndroidTokenStorage
 import id.ganyem.app.auth.AuthRepository
 import id.ganyem.app.auth.TokenManager
 import id.ganyem.app.auth.TokenStorage
+import id.ganyem.app.customer.CustomerApi
+import id.ganyem.app.customer.CustomerRepository
+import id.ganyem.app.customer.CustomerRepositoryImpl
 import id.ganyem.app.network.ApiClient
 import id.ganyem.app.network.AuthApi
 import id.ganyem.app.product.DefaultProductRepository
@@ -57,11 +60,21 @@ class MainActivity : ComponentActivity() {
             productApi
         )
 
+        val customerApi = CustomerApi(
+            apiClient = apiClient
+        )
+
+        val customerRepository = CustomerRepositoryImpl(
+            customerApi= customerApi
+        )
+
+
         setContent {
             App(
                 repository = repository,
                 productRepository = productRepository,
-                productApi = productApi
+                productApi = productApi,
+                customerRepository = customerRepository
             )
         }
     }

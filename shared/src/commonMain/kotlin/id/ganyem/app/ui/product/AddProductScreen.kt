@@ -3,9 +3,12 @@ package id.ganyem.app.ui.product
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -38,8 +41,11 @@ fun AddProductScreen(
     val state by viewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).background(color = Color.White),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp).background(color = Color.White),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+
 
     ) {
         Text(

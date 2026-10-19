@@ -15,12 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import id.ganyem.app.auth.AppTokens
 import id.ganyem.app.auth.AuthRepository
+import id.ganyem.app.customer.CustomerRepository
 import id.ganyem.app.product.Product
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
 import id.ganyem.app.ui.HomeScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
+import id.ganyem.app.ui.order.OrderScreen
 import id.ganyem.app.ui.product.AddProductScreen
 import id.ganyem.app.ui.product.EditProductScreen
 import id.ganyem.app.ui.product.ProductListScreen
@@ -30,7 +32,8 @@ import kotlinx.coroutines.launch
 fun App(
     repository: AuthRepository,
     productRepository: ProductRepository,
-    productApi: ProductApi
+    productApi: ProductApi,
+    customerRepository: CustomerRepository
 ) {
     val scope = rememberCoroutineScope()
 
@@ -52,6 +55,10 @@ fun App(
 
     var selectedProduct by remember {
         mutableStateOf<Product?>(null)
+    }
+
+    var showCreateOrder by remember {
+        mutableStateOf(false)
     }
 
     LaunchedEffect(repository) {
@@ -80,14 +87,23 @@ fun App(
             )
         }
 
+        showCreateOrder -> {
+            OrderScreen(
+                onBack = {showCreateOrder = false },
+                customerRepository = customerRepository
+            )
+        }
+
         else -> {
             MainScreen(
-                onCreateOrder = {},
+                onCreateOrder = {
+                    showCreateOrder = true
+                },
                 homeContent = {
                     PlaceholderScreen("Home")
                 },
                 ordersContent = {
-                    PlaceholderScreen("Orders")
+                    showCreateOrder = true
                 },
                 itemsContent = {
                     when {
