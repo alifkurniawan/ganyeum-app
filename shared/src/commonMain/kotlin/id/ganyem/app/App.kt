@@ -21,7 +21,7 @@ import id.ganyem.app.product.Product
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
 import id.ganyem.app.shipping.ShippingRepository
-import id.ganyem.app.ui.HomeScreen
+import id.ganyem.app.ui.OthersScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
 import id.ganyem.app.ui.order.OrderScreen
@@ -148,9 +148,8 @@ fun App(
                     }
                 },
                 othersContent = {
-                    HomeScreen(
-                        accessToken = tokens?.accessToken,
-                        onAddProduct = {},
+                    OthersScreen(
+                        customerRepository = customerRepository,
                         onLogout = {
                             scope.launch {
                                 try {
