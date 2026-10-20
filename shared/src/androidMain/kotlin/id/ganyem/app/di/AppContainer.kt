@@ -23,10 +23,9 @@ import id.ganyem.app.shipping.ShippingRepository
 import id.ganyem.app.shipping.ShippingRepositoryImpl
 
 class AppContainer(
-    activity: ComponentActivity
+    activity: ComponentActivity,
+    private val baseUrl: String
 ) {
-    private val baseUrl = "http://192.168.1.8:8080/api"
-
     private val tokenManager = TokenManager()
     private val tokenStorage = AndroidTokenStorage(activity)
 

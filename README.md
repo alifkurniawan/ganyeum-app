@@ -1,31 +1,80 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Ganyem
 
-* [/iosApp](./iosApp/iosApp) contains an iOS application. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Ganyem is a cross-platform mobile app for managing a product catalog and orders. It is built with Kotlin Multiplatform and Compose Multiplatform. The `shared` module contains most of the UI and business logic, with platform-specific entry points for Android and iOS.
 
-* [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./shared/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./shared/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
-    folder is the appropriate location.
+## Available features
 
-### Running the apps
+- Google sign-in and session restoration with tokens.
+- View, add, edit, and delete products.
+- Create orders by selecting a customer, products, and a shipping service.
+- View the order list.
+- View or manage customer data from the **Others** menu.
 
-Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
+> The Home screen currently displays a “Coming soon” placeholder. The app requires a running Ganyem API backend that is reachable from the device.
 
-- Android app: `./gradlew :androidApp:assembleDebug`
-- iOS app: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+## Technology
 
-### Running tests
+- Kotlin Multiplatform, Kotlin Coroutines, and Kotlin Serialization.
+- Compose Multiplatform and Material 3 for the shared UI.
+- Ktor Client for HTTP communication (OkHttp on Android, Darwin on iOS).
+- Google/Firebase Authentication for sign-in.
+- Android: Gradle, Android Gradle Plugin, minimum SDK 24.
+- iOS: SwiftUI entry point hosting the shared Compose UI.
 
-Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
+## Project structure
 
-- Android tests: `./gradlew :shared:testAndroidHostTest`
-- iOS tests: `./gradlew :shared:iosSimulatorArm64Test`
+```text
+androidApp/    Android application entry point and build configuration
+iosApp/        Xcode project and SwiftUI entry point
+shared/        Shared Compose UI, authentication, models, repositories, and API
+```
 
----
+The main shared code is in `shared/src/commonMain/kotlin/id/ganyem/app`. Platform-specific implementations are in `androidMain` and `iosMain`; tests are in `commonTest`, `androidHostTest`, and `iosTest`.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Running the app
+
+### Prerequisites
+
+- A JDK compatible with the project's Gradle Wrapper.
+- Android Studio and the Android SDK to build or run the Android app.
+- Xcode with iOS Simulator support to run the iOS app.
+- The Ganyem API backend and the required Google/Firebase Authentication configuration.
+
+### Android
+
+1. Open the project in Android Studio and wait for Gradle sync to complete.
+2. Make sure the Firebase/Google Services configuration is available for the Android app.
+3. Set the backend URL in `androidApp/build.gradle.kts` using `API_BASE_URL` in the `debug` configuration (the `release` configuration has its own value). The current default debug URL is `http://192.168.1.8:8080/api`; change it to an address reachable from your device or emulator.
+4. Run the Android app configuration from Android Studio, or build a debug APK:
+
+   ```bash
+   ./gradlew :androidApp:assembleDebug
+   ```
+
+### iOS
+
+1. Open `iosApp/iosApp.xcodeproj` in Xcode.
+2. Set the `API_BASE_URL` build setting so it is available as `API_BASE_URL` in the app's `Info.plist`. The app will stop at startup if this value is empty or unset.
+3. Configure Google Sign-In for iOS, then select an iOS Simulator or device and run the app from Xcode.
+
+For an emulator or device, use a backend address that the device can reach; `localhost` usually refers to the device itself.
+
+## Tests
+
+Run the shared logic tests on the Android host:
+
+```bash
+./gradlew :shared:testAndroidHostTest
+```
+
+iOS Simulator tests can be run on macOS with a suitable simulator:
+
+```bash
+./gradlew :shared:iosSimulatorArm64Test
+```
+
+## API and authentication
+
+The app uses `/api` as the API base path. The endpoints it uses include authentication, `/products`, `/customers`, `/shippings`, and `/orders`. Authenticated API requests send the access token as a Bearer token. The token is refreshed through Google authentication when it is close to expiring or after a 401 response.
+
+The backend contract must match the models and requests in `shared/src/commonMain/kotlin/id/ganyem/app`. Backend and Firebase configuration details are maintained outside this repository.

@@ -2,36 +2,37 @@ package id.ganyem.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import id.ganyem.app.auth.AppTokens
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import id.ganyem.app.auth.AuthRepository
 import id.ganyem.app.customer.CustomerRepository
 import id.ganyem.app.order.OrderRepository
-import id.ganyem.app.product.Product
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
 import id.ganyem.app.shipping.ShippingRepository
 import id.ganyem.app.ui.LaunchScreen
-import id.ganyem.app.ui.OthersScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
-import id.ganyem.app.ui.order.OrderScreen
+import id.ganyem.app.ui.OthersScreen
+import id.ganyem.app.ui.auth.AuthViewModel
 import id.ganyem.app.ui.order.OrderListScreen
+import id.ganyem.app.ui.order.OrderScreen
 import id.ganyem.app.ui.product.AddProductScreen
 import id.ganyem.app.ui.product.EditProductScreen
 import id.ganyem.app.ui.product.ProductListScreen
+import id.ganyem.app.ui.product.ProductScreenState
 import id.ganyem.app.ui.theme.GanyemTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun App(
@@ -42,62 +43,46 @@ fun App(
     shippingRepository: ShippingRepository,
     orderRepository: OrderRepository
 ) {
-    val scope = rememberCoroutineScope()
-
-    var tokens by remember {
-        mutableStateOf<AppTokens?>(null)
-    }
-
-    var loading by remember {
-        mutableStateOf(true)
-    }
-
-    var error by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    var showAddProduct by remember {
-        mutableStateOf(false)
-    }
-
-    var selectedProduct by remember {
-        mutableStateOf<Product?>(null)
+    var productScreenState by remember {
+        mutableStateOf<ProductScreenState>(ProductScreenState.List)
     }
 
     var showCreateOrder by remember {
         mutableStateOf(false)
     }
 
-    LaunchedEffect(repository) {
-        try {
-            tokens = repository.restoreSession()
-        } catch (e: Exception) {
-            error = e.message ?: "Gagal memulihkan sesi."
-            tokens = null
-        } finally {
-            loading = false
+    val authViewModel = viewModel<AuthViewModel>(
+        factory = viewModelFactory {
+            initializer {
+                AuthViewModel(repository)
+            }
         }
+    )
+
+    val authState by authViewModel.uiState.collectAsState()
+
+    LaunchedEffect(authViewModel) {
+        authViewModel.restoreSession()
     }
 
     GanyemTheme {
         when {
-            loading -> {
+            authState.isLoading -> {
                 LaunchScreen()
             }
 
-            tokens == null -> {
+            authState.tokens == null -> {
                 LoginScreen(
                     repository = repository,
                     onLoginSuccess = { appTokens ->
-                        tokens = appTokens
-                        error = null
+                        authViewModel.onLoginSuccess(appTokens)
                     }
                 )
             }
 
             showCreateOrder -> {
                 OrderScreen(
-                    onBack = {showCreateOrder = false },
+                    onBack = { showCreateOrder = false },
                     customerRepository = customerRepository,
                     productRepository = productRepository,
                     shippingRepository = shippingRepository,
@@ -117,34 +102,32 @@ fun App(
                         OrderListScreen(repository = orderRepository)
                     },
                     itemsContent = {
-                        when {
-                            selectedProduct != null -> {
-                                EditProductScreen(
-                                    product = selectedProduct!!,
-                                    repository = productRepository,
-                                    onBack = {
-                                        selectedProduct = null
-                                    }
-                                )
-                            }
-
-                            showAddProduct -> {
-                                AddProductScreen(
-                                    productApi = productApi,
-                                    onBack = {
-                                        showAddProduct = false
-                                    }
-                                )
-                            }
-
-                            else -> {
+                        when (val state = productScreenState) {
+                            ProductScreenState.List -> {
                                 ProductListScreen(
                                     repository = productRepository,
                                     onAddProduct = {
-                                        showAddProduct = true
+                                        productScreenState = ProductScreenState.Add
                                     },
                                     onEditProduct = { product ->
-                                        selectedProduct = product
+                                        productScreenState = ProductScreenState.Edit(product)
+                                    }
+                                )
+                            }
+                            ProductScreenState.Add -> {
+                                AddProductScreen(
+                                    productApi = productApi,
+                                    onBack = {
+                                        productScreenState = ProductScreenState.List
+                                    }
+                                )
+                            }
+                            is ProductScreenState.Edit -> {
+                                EditProductScreen(
+                                    product = state.product,
+                                    repository = productRepository,
+                                    onBack = {
+                                        productScreenState = ProductScreenState.List
                                     }
                                 )
                             }
@@ -153,15 +136,7 @@ fun App(
                     othersContent = {
                         OthersScreen(
                             customerRepository = customerRepository,
-                            onLogout = {
-                                scope.launch {
-                                    try {
-                                        repository.logout()
-                                    } finally {
-                                        tokens = null
-                                    }
-                                }
-                            }
+                            onLogout = { authViewModel.logout() }
                         )
                     }
                 )

@@ -32,6 +32,12 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            "\"http://192.168.1.8:8080/api\""
+        )
     }
     packaging {
         resources {
@@ -39,8 +45,20 @@ android {
         }
     }
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"http://192.168.1.8:8080/api\""
+            )
+        }
         release {
             isMinifyEnabled = false
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"https://your-production-domain.com/api\""
+            )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -53,6 +71,6 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
-
 }
