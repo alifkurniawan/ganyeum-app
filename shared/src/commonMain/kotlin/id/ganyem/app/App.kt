@@ -21,6 +21,7 @@ import id.ganyem.app.product.Product
 import id.ganyem.app.product.ProductApi
 import id.ganyem.app.product.ProductRepository
 import id.ganyem.app.shipping.ShippingRepository
+import id.ganyem.app.ui.LaunchScreen
 import id.ganyem.app.ui.OthersScreen
 import id.ganyem.app.ui.LoginScreen
 import id.ganyem.app.ui.MainScreen
@@ -29,6 +30,7 @@ import id.ganyem.app.ui.order.OrderListScreen
 import id.ganyem.app.ui.product.AddProductScreen
 import id.ganyem.app.ui.product.EditProductScreen
 import id.ganyem.app.ui.product.ProductListScreen
+import id.ganyem.app.ui.theme.GanyemTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,7 +49,7 @@ fun App(
     }
 
     var loading by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     var error by remember {
@@ -77,92 +79,94 @@ fun App(
         }
     }
 
-    when {
-        loading -> {
-            CircularProgressIndicator()
-        }
+    GanyemTheme {
+        when {
+            loading -> {
+                LaunchScreen()
+            }
 
-        tokens == null -> {
-            LoginScreen(
-                repository = repository,
-                onLoginSuccess = { appTokens ->
-                    tokens = appTokens
-                    error = null
-                }
-            )
-        }
-
-        showCreateOrder -> {
-            OrderScreen(
-                onBack = {showCreateOrder = false },
-                customerRepository = customerRepository,
-                productRepository = productRepository,
-                shippingRepository = shippingRepository,
-                orderRepository = orderRepository
-            )
-        }
-
-        else -> {
-            MainScreen(
-                onCreateOrder = {
-                    showCreateOrder = true
-                },
-                homeContent = {
-                    PlaceholderScreen("Home")
-                },
-                ordersContent = {
-                    OrderListScreen(repository = orderRepository)
-                },
-                itemsContent = {
-                    when {
-                        selectedProduct != null -> {
-                            EditProductScreen(
-                                product = selectedProduct!!,
-                                repository = productRepository,
-                                onBack = {
-                                    selectedProduct = null
-                                }
-                            )
-                        }
-
-                        showAddProduct -> {
-                            AddProductScreen(
-                                productApi = productApi,
-                                onBack = {
-                                    showAddProduct = false
-                                }
-                            )
-                        }
-
-                        else -> {
-                            ProductListScreen(
-                                repository = productRepository,
-                                onAddProduct = {
-                                    showAddProduct = true
-                                },
-                                onEditProduct = { product ->
-                                    selectedProduct = product
-                                }
-                            )
-                        }
+            tokens == null -> {
+                LoginScreen(
+                    repository = repository,
+                    onLoginSuccess = { appTokens ->
+                        tokens = appTokens
+                        error = null
                     }
-                },
-                othersContent = {
-                    OthersScreen(
-                        customerRepository = customerRepository,
-                        onLogout = {
-                            scope.launch {
-                                try {
-                                    repository.logout()
-                                } finally {
-                                    tokens = null
-                                }
+                )
+            }
+
+            showCreateOrder -> {
+                OrderScreen(
+                    onBack = {showCreateOrder = false },
+                    customerRepository = customerRepository,
+                    productRepository = productRepository,
+                    shippingRepository = shippingRepository,
+                    orderRepository = orderRepository
+                )
+            }
+
+            else -> {
+                MainScreen(
+                    onCreateOrder = {
+                        showCreateOrder = true
+                    },
+                    homeContent = {
+                        PlaceholderScreen("Home")
+                    },
+                    ordersContent = {
+                        OrderListScreen(repository = orderRepository)
+                    },
+                    itemsContent = {
+                        when {
+                            selectedProduct != null -> {
+                                EditProductScreen(
+                                    product = selectedProduct!!,
+                                    repository = productRepository,
+                                    onBack = {
+                                        selectedProduct = null
+                                    }
+                                )
+                            }
+
+                            showAddProduct -> {
+                                AddProductScreen(
+                                    productApi = productApi,
+                                    onBack = {
+                                        showAddProduct = false
+                                    }
+                                )
+                            }
+
+                            else -> {
+                                ProductListScreen(
+                                    repository = productRepository,
+                                    onAddProduct = {
+                                        showAddProduct = true
+                                    },
+                                    onEditProduct = { product ->
+                                        selectedProduct = product
+                                    }
+                                )
                             }
                         }
-                    )
-                }
-            )
+                    },
+                    othersContent = {
+                        OthersScreen(
+                            customerRepository = customerRepository,
+                            onLogout = {
+                                scope.launch {
+                                    try {
+                                        repository.logout()
+                                    } finally {
+                                        tokens = null
+                                    }
+                                }
+                            }
+                        )
+                    }
+                )
 
+            }
         }
     }
 }

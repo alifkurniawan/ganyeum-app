@@ -1,0 +1,13 @@
+<resources>
+    <string name="login_brand">Gan-Yeum</string>
+    <string name="login_hero_badge">❉  Segarnya terjaga. Usaha tertata.</string>
+    <string name="login_title">Jualan lancar. Stok tetap terjaga.</string>
+    <string name="login_description">Kelola pesanan, produk, dan pelanggan toko frozen food dalam satu genggaman.</string>
+    <string name="login_google_sign_in">Masuk dengan Google</string>
+    <string name="login_loading">Memproses login...</string>
+    <string name="login_security_info">Gunakan akun Gmail untuk masuk dengan aman.\nTidak perlu membuat kata sandi baru.</string>
+    <string name="login_legal_disclaimer">Dengan masuk, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi Gan-Yeum.</string>
+    <string name="login_footer">Dibuat untuk keseharian toko Anda.</string>
+    <string name="login_error_fallback">Login gagal</string>
+    <string name="login_hero_content_description">Hidangan frozen food</string>
+</resources>
